@@ -1,3 +1,4 @@
+-- IMPORTANT!! Must run this file first!!!
 SET SERVEROUTPUT ON SIZE UNLIMITED;
 
 -- Procedures for showing available options before user input
