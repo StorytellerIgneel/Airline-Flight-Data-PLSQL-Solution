@@ -49,7 +49,7 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20002, '❌ Duration must be greater than 0 hours.');
     END IF;
 
-    -- �Validation 3: Price must be positive
+    -- Validation 3: Price must be positive
     IF v_price <= 0 THEN
         RAISE_APPLICATION_ERROR(-20003, '❌ Price must be greater than 0 RM.');
     END IF;
@@ -69,6 +69,7 @@ BEGIN
 
     COMMIT;
     DBMS_OUTPUT.PUT_LINE('--------------------------------');
+    DBMS_OUTPUT.PUT_LINE('RESULTS:');
     DBMS_OUTPUT.PUT_LINE('✅ Flight inserted successfully.');
     DBMS_OUTPUT.PUT_LINE('--------------------------------');
 EXCEPTION
@@ -76,6 +77,7 @@ EXCEPTION
         ROLLBACK TO s1;
         error_message := SQLERRM;
         DBMS_OUTPUT.PUT_LINE('------------------------------------------------');
+        DBMS_OUTPUT.PUT_LINE('RESULTS:');
         DBMS_OUTPUT.PUT_LINE('⚠️ An error occurred: ' || error_message);
         DBMS_OUTPUT.PUT_LINE('------------------------------------------------');
 END;
