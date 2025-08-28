@@ -128,20 +128,20 @@ BEGIN
     
     COMMIT;
     
-    DBMS_OUTPUT.PUT_LINE('==========================================');
+    DBMS_OUTPUT.PUT_LINE('=========================================');
     DBMS_OUTPUT.PUT_LINE('UPDATE RESULTS:');
     DBMS_OUTPUT.PUT_LINE('✅ Flight updated successfully!');
-    DBMS_OUTPUT.PUT_LINE('==========================================');
+    DBMS_OUTPUT.PUT_LINE('=========================================');
     
 EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK TO update_flight;
         error_message := SQLERRM;
-        DBMS_OUTPUT.PUT_LINE('==========================================');
+        DBMS_OUTPUT.PUT_LINE('=========================================');
         DBMS_OUTPUT.PUT_LINE('UPDATE RESULTS:');
         DBMS_OUTPUT.PUT_LINE('⚠ An error occurred: ' || error_message);
         DBMS_OUTPUT.PUT_LINE('⚠ All changes have been rolled back.');
-        DBMS_OUTPUT.PUT_LINE('==========================================');
+        DBMS_OUTPUT.PUT_LINE('=========================================');
 END;
 /
 

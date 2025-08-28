@@ -50,19 +50,19 @@ BEGIN
 
     COMMIT;
 
-    DBMS_OUTPUT.PUT_LINE('==========================================');
+    DBMS_OUTPUT.PUT_LINE('=========================================');
     DBMS_OUTPUT.PUT_LINE('INSERT RESULTS:');
     DBMS_OUTPUT.PUT_LINE('✅ Flight inserted successfully!');
-    DBMS_OUTPUT.PUT_LINE('==========================================');
+    DBMS_OUTPUT.PUT_LINE('=========================================');
 EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK TO insert_flight;
         error_message := SQLERRM;
-        DBMS_OUTPUT.PUT_LINE('==========================================');
+        DBMS_OUTPUT.PUT_LINE('=========================================');
         DBMS_OUTPUT.PUT_LINE('INSERT RESULTS:');
         DBMS_OUTPUT.PUT_LINE('⚠ Error inserting flight: ' || error_message);
         DBMS_OUTPUT.PUT_LINE('⚠ All changes have been rolled back.');
-        DBMS_OUTPUT.PUT_LINE('==========================================');
+        DBMS_OUTPUT.PUT_LINE('=========================================');
 END;
 /
 
