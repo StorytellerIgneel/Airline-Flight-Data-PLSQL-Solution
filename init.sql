@@ -16,6 +16,7 @@
         EXECUTE IMMEDIATE 'DROP TABLE Time CASCADE CONSTRAINTS';
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
+    /
 
     -- ==========================================
     -- STEP 2: Recreate Tables (with AUTO-INCREMENT IDs)
@@ -214,12 +215,11 @@
                     TO_NUMBER(REGEXP_SUBSTR(v_line,'[^,]+',1,11)),
                     TO_NUMBER(REGEXP_SUBSTR(v_line,'[^,]+',1,12))
                 );
-            EXCEPTIONS
+            EXCEPTION
                 WHEN OTHERS THEN
                     -- Rollback to after classes since most likely the problem comes from flight (reference tables are stable)
                     ROLLBACK TO SAVEPOINT after_class;
                     RAISE_APPLICATION_ERROR(-20009, 'Error on line: ' || v_line || ' - ' || SQLERRM);
-                    NULL;
             END;
         END LOOP;
         UTL_FILE.FCLOSE(v_file);
