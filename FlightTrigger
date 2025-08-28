@@ -125,7 +125,7 @@ BEGIN
     );
 
     -- Display flightlog
-    DBMS_OUTPUT.PUT_LINE('--------------------------------');
+    DBMS_OUTPUT.PUT_LINE('==========================================');
     IF INSERTING THEN
         DBMS_OUTPUT.PUT_LINE('✈️ New Flight Logged ✈️');
     ELSIF UPDATING THEN
@@ -143,7 +143,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Days Left        : ' || :NEW.days_left);
     DBMS_OUTPUT.PUT_LINE('Price (RM)       : ' || :NEW.price);
     DBMS_OUTPUT.PUT_LINE('Logged by        : ' || v_username);
-    DBMS_OUTPUT.PUT_LINE('--------------------------------');
+    DBMS_OUTPUT.PUT_LINE('==========================================');
 END;
 /
 
