@@ -1,0 +1,87 @@
+DROP TABLE flightlog CASCADE CONSTRAINTS;
+CREATE TABLE flightlog (
+    flight_code         VARCHAR2(50),
+    airline_id          NUMBER,
+    source_city_id      NUMBER,
+    destination_city_id NUMBER,
+    departure_time_id   NUMBER,
+    arrival_time_id     NUMBER,
+    stops_id            NUMBER,
+    class_id            NUMBER,
+    duration            NUMBER,
+    days_left           NUMBER,
+    price               NUMBER,
+    uname               VARCHAR2(30),
+    log_timestamp       TIMESTAMP DEFAULT SYSTIMESTAMP
+);
+
+CREATE OR REPLACE TRIGGER displayandlogflight
+AFTER INSERT OR UPDATE ON Flight
+FOR EACH ROW
+DECLARE
+    v_username           VARCHAR2(30);
+    v_airline_name       VARCHAR2(100);
+    v_source_city_name   VARCHAR2(100);
+    v_dest_city_name     VARCHAR2(100);
+    v_departure_time_val VARCHAR2(100);
+    v_arrival_time_val   VARCHAR2(100);
+    v_stop_count         VARCHAR2(50);
+    v_class_name         VARCHAR2(50);
+BEGIN
+    -- Current user
+    SELECT USER INTO v_username FROM dual;
+
+    -- Fetch names/descriptions, handle missing gracefully
+    BEGIN SELECT airline_name INTO v_airline_name FROM Airline WHERE airline_id = :NEW.airline_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN v_airline_name := 'Unknown Airline'; END;
+
+    BEGIN SELECT city_name INTO v_source_city_name FROM City WHERE city_id = :NEW.source_city_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN v_source_city_name := 'Unknown City'; END;
+
+    BEGIN SELECT city_name INTO v_dest_city_name FROM City WHERE city_id = :NEW.destination_city_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN v_dest_city_name := 'Unknown City'; END;
+
+    BEGIN SELECT time_category INTO v_departure_time_val FROM Time WHERE time_id = :NEW.departure_time_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN v_departure_time_val := 'Unknown Time'; END;
+
+    BEGIN SELECT time_category INTO v_arrival_time_val FROM Time WHERE time_id = :NEW.arrival_time_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN v_arrival_time_val := 'Unknown Time'; END;
+
+    BEGIN SELECT stop_count INTO v_stop_count FROM Stop WHERE stop_id = :NEW.stops_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN v_stop_count := 'Unknown Stop'; END;
+
+    BEGIN SELECT class_name INTO v_class_name FROM Class WHERE class_id = :NEW.class_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN v_class_name := 'Unknown Class'; END;
+
+    -- Insert into flightlog
+    INSERT INTO flightlog (
+        flight_code, airline_id, source_city_id, destination_city_id,
+        departure_time_id, arrival_time_id, stops_id, class_id,
+        duration, days_left, price, uname
+    ) VALUES (
+        :NEW.flight_code, :NEW.airline_id, :NEW.source_city_id, :NEW.destination_city_id,
+        :NEW.departure_time_id, :NEW.arrival_time_id, :NEW.stops_id, :NEW.class_id,
+        :NEW.duration, :NEW.days_left, :NEW.price, v_username
+    );
+
+    -- Display friendly log
+    dbms_output.put_line('--------------------------------');
+    IF INSERTING THEN
+        dbms_output.put_line('✈️ New Flight Logged ✈️');
+    ELSIF UPDATING THEN
+        dbms_output.put_line('✈️ Flight Update Logged ✈️');
+    END IF;
+    dbms_output.put_line('Flight Code      : ' || :NEW.flight_code);
+    dbms_output.put_line('Airline          : ' || v_airline_name);
+    dbms_output.put_line('Route            : ' || v_source_city_name || ' → ' || v_dest_city_name);
+    dbms_output.put_line('Departure Time   : ' || v_departure_time_val);
+    dbms_output.put_line('Arrival Time     : ' || v_arrival_time_val);
+    dbms_output.put_line('Stops            : ' || v_stop_count);
+    dbms_output.put_line('Class            : ' || v_class_name);
+    dbms_output.put_line('Duration (hrs)   : ' || :NEW.duration);
+    dbms_output.put_line('Days Left        : ' || :NEW.days_left);
+    dbms_output.put_line('Price (RM)       : ' || :NEW.price);
+    dbms_output.put_line('Logged by        : ' || v_username);
+    dbms_output.put_line('--------------------------------');
+END;
+/
