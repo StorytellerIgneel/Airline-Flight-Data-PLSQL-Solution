@@ -1,5 +1,6 @@
 DROP TABLE flightlog CASCADE CONSTRAINTS;
 CREATE TABLE flightlog (
+    flight_id           NUMBER,
     flight_code         VARCHAR2(50),
     airline_id          NUMBER,
     source_city_id      NUMBER,
@@ -16,12 +17,12 @@ CREATE TABLE flightlog (
 );
 
 CREATE OR REPLACE TRIGGER flight_before_insert_update
-BEFORE INSERT ON Flight
+BEFORE INSERT OR UPDATE ON Flight
 FOR EACH ROW
 DECLARE
     v_dummy NUMBER;
 BEGIN
-    -- Basic validations
+    -- Basic validation
     IF :NEW.source_city_id = :NEW.destination_city_id THEN
         RAISE_APPLICATION_ERROR(-20001, '❌ Source City and Destination City cannot be the same.');
     END IF;
@@ -34,59 +35,47 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20003, '❌ Price must be greater than 0 RM.');
     END IF;
 
-    -- ID validations
-    BEGIN
-        SELECT 1 INTO v_dummy FROM Airline WHERE airline_id = :NEW.airline_id;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20010, '❌ Airline ID does not exist.');
+    IF :NEW.days_left < 0 THEN
+        RAISE_APPLICATION_ERROR(-20004, '❌ Days left cannot be negative.');
+    END IF;
+
+    -- ID validation
+    BEGIN SELECT 1 INTO v_dummy FROM Airline WHERE airline_id = :NEW.airline_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20005, '❌ Airline ID does not exist.');
     END;
 
-    BEGIN
-        SELECT 1 INTO v_dummy FROM City WHERE city_id = :NEW.source_city_id;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20011, '❌ Source City ID does not exist.');
+    BEGIN SELECT 1 INTO v_dummy FROM City WHERE city_id = :NEW.source_city_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20006, '❌ Source City ID does not exist.');
     END;
 
-    BEGIN
-        SELECT 1 INTO v_dummy FROM City WHERE city_id = :NEW.destination_city_id;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20012, '❌ Destination City ID does not exist.');
+    BEGIN SELECT 1 INTO v_dummy FROM City WHERE city_id = :NEW.destination_city_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20007, '❌ Destination City ID does not exist.');
     END;
 
-    BEGIN
-        SELECT 1 INTO v_dummy FROM Time WHERE time_id = :NEW.departure_time_id;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20013, '❌ Departure Time ID does not exist.');
+    BEGIN SELECT 1 INTO v_dummy FROM Time WHERE time_id = :NEW.departure_time_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20008, '❌ Departure Time ID does not exist.');
     END;
 
-    BEGIN
-        SELECT 1 INTO v_dummy FROM Time WHERE time_id = :NEW.arrival_time_id;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20014, '❌ Arrival Time ID does not exist.');
+    BEGIN SELECT 1 INTO v_dummy FROM Time WHERE time_id = :NEW.arrival_time_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20009, '❌ Arrival Time ID does not exist.');
     END;
 
-    BEGIN
-        SELECT 1 INTO v_dummy FROM Stop WHERE stop_id = :NEW.stops_id;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20015, '❌ Stop ID does not exist.');
+    BEGIN SELECT 1 INTO v_dummy FROM Stop WHERE stop_id = :NEW.stops_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20010, '❌ Stop ID does not exist.');
     END;
 
-    BEGIN
-        SELECT 1 INTO v_dummy FROM Class WHERE class_id = :NEW.class_id;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20016, '❌ Class ID does not exist.');
+    BEGIN SELECT 1 INTO v_dummy FROM Class WHERE class_id = :NEW.class_id;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20011, '❌ Class ID does not exist.');
     END;
-
 END;
 /
-
 
 CREATE OR REPLACE TRIGGER flight_after_insert_update
 AFTER INSERT OR UPDATE ON Flight
@@ -101,10 +90,8 @@ DECLARE
     v_stop_count         VARCHAR2(50);
     v_class_name         VARCHAR2(50);
 BEGIN
-    -- Current user
     SELECT USER INTO v_username FROM dual;
 
-    -- Fetch names/descriptions, handle missing gracefully
     BEGIN SELECT airline_name INTO v_airline_name FROM Airline WHERE airline_id = :NEW.airline_id;
     EXCEPTION WHEN NO_DATA_FOUND THEN v_airline_name := 'Unknown Airline'; END;
 
@@ -128,11 +115,11 @@ BEGIN
 
     -- Insert into flightlog
     INSERT INTO flightlog (
-        flight_code, airline_id, source_city_id, destination_city_id,
+        flight_id, flight_code, airline_id, source_city_id, destination_city_id,
         departure_time_id, arrival_time_id, stops_id, class_id,
         duration, days_left, price, uname
     ) VALUES (
-        :NEW.flight_code, :NEW.airline_id, :NEW.source_city_id, :NEW.destination_city_id,
+        :NEW.flight_id, :NEW.flight_code, :NEW.airline_id, :NEW.source_city_id, :NEW.destination_city_id,
         :NEW.departure_time_id, :NEW.arrival_time_id, :NEW.stops_id, :NEW.class_id,
         :NEW.duration, :NEW.days_left, :NEW.price, v_username
     );
@@ -144,6 +131,7 @@ BEGIN
     ELSIF UPDATING THEN
         dbms_output.put_line('✈️ Flight Update Logged ✈️');
     END IF;
+    dbms_output.put_line('Flight ID        : ' || :NEW.flight_id);
     dbms_output.put_line('Flight Code      : ' || :NEW.flight_code);
     dbms_output.put_line('Airline          : ' || v_airline_name);
     dbms_output.put_line('Route            : ' || v_source_city_name || ' → ' || v_dest_city_name);
@@ -158,6 +146,7 @@ BEGIN
     dbms_output.put_line('--------------------------------');
 END;
 /
+
 
 -- Show all triggers in your schema
 -- SELECT trigger_name, table_name, status
