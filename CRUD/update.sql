@@ -1,13 +1,7 @@
 -- CRUD Operation
 -- Update records in Flight table
 ACCEPT v_flight_id NUMBER PROMPT 'Enter Flight ID to update: '
-BEGIN
-    Show_Flight_Details(&v_flight_id);
-EXCEPTION
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('❌ Error: ' || SQLERRM);
-END;
-/
+EXEC Show_Flight_Details(&v_flight_id);
 
 EXEC Show_Airlines;
 ACCEPT v_new_airline_id NUMBER PROMPT 'Enter new Airline ID (or 0 to keep current): '
