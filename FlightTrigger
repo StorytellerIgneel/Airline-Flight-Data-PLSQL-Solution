@@ -125,28 +125,27 @@ BEGIN
     );
 
     -- Display flightlog
-    dbms_output.put_line('--------------------------------');
+    DBMS_OUTPUT.PUT_LINE('--------------------------------');
     IF INSERTING THEN
-        dbms_output.put_line('✈️ New Flight Logged ✈️');
+        DBMS_OUTPUT.PUT_LINE('✈️ New Flight Logged ✈️');
     ELSIF UPDATING THEN
-        dbms_output.put_line('✈️ Flight Update Logged ✈️');
+        DBMS_OUTPUT.PUT_LINE('✈️ Flight Update Logged ✈️');
     END IF;
-    dbms_output.put_line('Flight ID        : ' || :NEW.flight_id);
-    dbms_output.put_line('Flight Code      : ' || :NEW.flight_code);
-    dbms_output.put_line('Airline          : ' || v_airline_name);
-    dbms_output.put_line('Route            : ' || v_source_city_name || ' → ' || v_dest_city_name);
-    dbms_output.put_line('Departure Time   : ' || v_departure_time_val);
-    dbms_output.put_line('Arrival Time     : ' || v_arrival_time_val);
-    dbms_output.put_line('Stops            : ' || v_stop_count);
-    dbms_output.put_line('Class            : ' || v_class_name);
-    dbms_output.put_line('Duration (hrs)   : ' || :NEW.duration);
-    dbms_output.put_line('Days Left        : ' || :NEW.days_left);
-    dbms_output.put_line('Price (RM)       : ' || :NEW.price);
-    dbms_output.put_line('Logged by        : ' || v_username);
-    dbms_output.put_line('--------------------------------');
+    DBMS_OUTPUT.PUT_LINE('Flight ID        : ' || :NEW.flight_id);
+    DBMS_OUTPUT.PUT_LINE('Flight Code      : ' || :NEW.flight_code);
+    DBMS_OUTPUT.PUT_LINE('Airline          : ' || v_airline_name);
+    DBMS_OUTPUT.PUT_LINE('Route            : ' || v_source_city_name || ' → ' || v_dest_city_name);
+    DBMS_OUTPUT.PUT_LINE('Departure Time   : ' || v_departure_time_val);
+    DBMS_OUTPUT.PUT_LINE('Arrival Time     : ' || v_arrival_time_val);
+    DBMS_OUTPUT.PUT_LINE('Stops            : ' || v_stop_count);
+    DBMS_OUTPUT.PUT_LINE('Class            : ' || v_class_name);
+    DBMS_OUTPUT.PUT_LINE('Duration (hours) : ' || :NEW.duration);
+    DBMS_OUTPUT.PUT_LINE('Days Left        : ' || :NEW.days_left);
+    DBMS_OUTPUT.PUT_LINE('Price (RM)       : ' || :NEW.price);
+    DBMS_OUTPUT.PUT_LINE('Logged by        : ' || v_username);
+    DBMS_OUTPUT.PUT_LINE('--------------------------------');
 END;
 /
-
 
 -- Show all triggers in your schema
 -- SELECT trigger_name, table_name, status
