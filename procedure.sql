@@ -92,7 +92,7 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Class            : ' || rec.class_name);
         DBMS_OUTPUT.PUT_LINE('Duration (hours) : ' || rec.duration);
         DBMS_OUTPUT.PUT_LINE('Days Left        : ' || rec.days_left);
-        DBMS_OUTPUT.PUT_LINE('Price (RM)       : ' || rec.price);
+        DBMS_OUTPUT.PUT_LINE('Price (USD)      : ' || rec.price);
     END LOOP;
 
     DBMS_OUTPUT.PUT_LINE('==========================================');
