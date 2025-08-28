@@ -15,7 +15,80 @@ CREATE TABLE flightlog (
     log_timestamp       TIMESTAMP DEFAULT SYSTIMESTAMP
 );
 
-CREATE OR REPLACE TRIGGER displayandlogflight
+CREATE OR REPLACE TRIGGER flight_before_insert_update
+BEFORE INSERT ON Flight
+FOR EACH ROW
+DECLARE
+    v_dummy NUMBER;
+BEGIN
+    -- Basic validations
+    IF :NEW.source_city_id = :NEW.destination_city_id THEN
+        RAISE_APPLICATION_ERROR(-20001, '❌ Source City and Destination City cannot be the same.');
+    END IF;
+
+    IF :NEW.duration <= 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, '❌ Duration must be greater than 0 hours.');
+    END IF;
+
+    IF :NEW.price <= 0 THEN
+        RAISE_APPLICATION_ERROR(-20003, '❌ Price must be greater than 0 RM.');
+    END IF;
+
+    -- ID validations
+    BEGIN
+        SELECT 1 INTO v_dummy FROM Airline WHERE airline_id = :NEW.airline_id;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20010, '❌ Airline ID does not exist.');
+    END;
+
+    BEGIN
+        SELECT 1 INTO v_dummy FROM City WHERE city_id = :NEW.source_city_id;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20011, '❌ Source City ID does not exist.');
+    END;
+
+    BEGIN
+        SELECT 1 INTO v_dummy FROM City WHERE city_id = :NEW.destination_city_id;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20012, '❌ Destination City ID does not exist.');
+    END;
+
+    BEGIN
+        SELECT 1 INTO v_dummy FROM Time WHERE time_id = :NEW.departure_time_id;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20013, '❌ Departure Time ID does not exist.');
+    END;
+
+    BEGIN
+        SELECT 1 INTO v_dummy FROM Time WHERE time_id = :NEW.arrival_time_id;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20014, '❌ Arrival Time ID does not exist.');
+    END;
+
+    BEGIN
+        SELECT 1 INTO v_dummy FROM Stop WHERE stop_id = :NEW.stops_id;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20015, '❌ Stop ID does not exist.');
+    END;
+
+    BEGIN
+        SELECT 1 INTO v_dummy FROM Class WHERE class_id = :NEW.class_id;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20016, '❌ Class ID does not exist.');
+    END;
+
+END;
+/
+
+
+CREATE OR REPLACE TRIGGER flight_after_insert_update
 AFTER INSERT OR UPDATE ON Flight
 FOR EACH ROW
 DECLARE
@@ -64,7 +137,7 @@ BEGIN
         :NEW.duration, :NEW.days_left, :NEW.price, v_username
     );
 
-    -- Display friendly log
+    -- Display flightlog
     dbms_output.put_line('--------------------------------');
     IF INSERTING THEN
         dbms_output.put_line('✈️ New Flight Logged ✈️');
@@ -85,3 +158,10 @@ BEGIN
     dbms_output.put_line('--------------------------------');
 END;
 /
+
+-- Show all triggers in your schema
+-- SELECT trigger_name, table_name, status
+-- FROM user_triggers;
+
+-- DROP TRIGGER displayandlogflight;
+
