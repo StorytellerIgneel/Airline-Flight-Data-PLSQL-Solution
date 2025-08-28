@@ -1,5 +1,5 @@
 -- ==========================================
--- STEP 0: Prompt for File Path & File Name
+-- STEP 1: Prompt for File Path & File Name
 -- ==========================================
 ACCEPT file_path CHAR PROMPT 'Enter full OS path for Data Pump directory: '
 ACCEPT csv_file_name CHAR PROMPT 'Enter CSV file name: '
@@ -69,7 +69,7 @@ ACCEPT csv_file_name CHAR PROMPT 'Enter CSV file name: '
 -- );
 
 -- ==========================================
--- STEP 3: CSV Import via UTL_FILE
+-- STEP 2: CSV Import via UTL_FILE
 -- ==========================================
 DECLARE
     v_file      UTL_FILE.FILE_TYPE;
@@ -214,7 +214,7 @@ END;
 COMMIT;
 
 -- ==========================================
--- STEP 4: Verification
+-- STEP 3: Verification
 -- ==========================================
 -- SELECT COUNT(*) AS total_flights FROM Flight;
 -- SELECT COUNT(*) AS total_airlines FROM Airline;
