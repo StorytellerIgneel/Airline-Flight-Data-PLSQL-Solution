@@ -1,18 +1,19 @@
-SET SERVEROUTPUT ON;
+SET SERVEROUTPUT ON SIZE UNLIMITED;
 
 ACCEPT prompt_table_name  PROMPT 'Enter table name: '
-ACCEPT prompt_output      PROMPT 'Enter output columns (x,y,z): '
+ACCEPT prompt_output      PROMPT 'Enter output columns (e.g., x, y, z): '
+ACCEPT prompt_join        PROMPT 'Enter JOIN clause (optional, e.g., class c): '
+ACCEPT prompt_on          PROMPT 'Enter ON clause (optional if JOIN, e.g., f.class_id=c.class_id): ' 
 ACCEPT prompt_condition   PROMPT 'Enter filter condition (e.g., id=2, flight_code=''SG-8709''): '
 
 DECLARE
-    v_sql   VARCHAR2(1000);
-    v_table VARCHAR2(100) := '&prompt_table_name';
-    v_output VARCHAR2(100) := '&prompt_output';
-    v_cond  VARCHAR2(400) := '&prompt_condition';
-    c       SYS_REFCURSOR;
-    v1      VARCHAR2(4000);
-    v2      VARCHAR2(4000);
-
+    v_sql       VARCHAR2(2000);
+    v_table     VARCHAR2(2000) := '&prompt_table_name';
+    v_join      VARCHAR2(2000) := '&prompt_join';
+    v_on        VARCHAR2(2000) := '&prompt_on';
+    v_output    VARCHAR2(2000) := '&prompt_output';
+    v_cond      VARCHAR2(2000) := '&prompt_condition';
+    c           SYS_REFCURSOR;
     v_cursor    INTEGER;
     v_col_cnt   INTEGER;
     v_desc_tab  DBMS_SQL.DESC_TAB;
@@ -22,6 +23,10 @@ DECLARE
 BEGIN
     -- Build SQL dynamically
     v_sql := 'SELECT ' || v_output || ' FROM ' || v_table;
+    
+    IF TRIM(v_join) IS NOT NULL THEN
+        v_sql := v_sql || ' JOIN ' || v_join || ' ON ' || v_on;
+    END IF;
     
     IF v_cond IS NOT NULL THEN
         v_sql := v_sql || ' WHERE ' || v_cond;
