@@ -1,5 +1,5 @@
-SET SERVEROUTPUT ON;
-
+-- CRUD Operation
+-- Read records in all table
 ACCEPT prompt_table_name  PROMPT 'Enter table name: '
 ACCEPT prompt_output      PROMPT 'Enter output columns (x,y,z): '
 ACCEPT prompt_condition   PROMPT 'Enter filter condition (e.g., id=2, flight_code=''SG-8709''): '
@@ -20,7 +20,6 @@ DECLARE
     v_dummy     INT;
     v_row_count INTEGER := 0; -- output counter 
 BEGIN
-    -- Build SQL dynamically
     v_sql := 'SELECT ' || v_output || ' FROM ' || v_table;
     
     IF v_cond IS NOT NULL THEN
