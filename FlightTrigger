@@ -1,4 +1,4 @@
-DROP TABLE flightlog CASCADE CONSTRAINTS;
+-- Trigger tables
 CREATE TABLE flightlog (
     flight_id           NUMBER,
     flight_code         VARCHAR2(50),
@@ -15,7 +15,15 @@ CREATE TABLE flightlog (
     uname               VARCHAR2(30),
     log_timestamp       TIMESTAMP DEFAULT SYSTIMESTAMP
 );
+CREATE TABLE flightaudit (
+    audit_id    NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    flight_id   NUMBER,
+    airline_id  NUMBER,
+    flight_code VARCHAR2(20),
+    deleted_at  TIMESTAMP DEFAULT SYSTIMESTAMP
+);
 
+-- Before Insert/Update Trigger 
 CREATE OR REPLACE TRIGGER flight_before_insert_update
 BEFORE INSERT OR UPDATE ON Flight
 FOR EACH ROW
@@ -77,6 +85,7 @@ BEGIN
 END;
 /
 
+-- After Insert/Update Trigger
 CREATE OR REPLACE TRIGGER flight_after_insert_update
 AFTER INSERT OR UPDATE ON Flight
 FOR EACH ROW
@@ -147,9 +156,51 @@ BEGIN
 END;
 /
 
--- Show all triggers in your schema
--- SELECT trigger_name, table_name, status
--- FROM user_triggers;
+-- Befire Delete Trigger
+CREATE OR REPLACE TRIGGER flight_before_delete
+BEFORE DELETE ON Flight
+FOR EACH ROW
+BEGIN
+    IF :OLD.flight_id IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20021, '❌ Cannot delete: FLIGHT_ID is NULL.');
+    ELSIF :OLD.flight_id <= 0 THEN
+        RAISE_APPLICATION_ERROR(-20022, '❌ Cannot delete: Invalid FLIGHT_ID (must be > 0).');
+    END IF;
 
--- DROP TRIGGER displayandlogflight;
+    IF NVL(:OLD.days_left,0) <=1 THEN
+        RAISE_APPLICATION_ERROR(-20023,'❌ Cannot delete: Flight occurs within 1 days.');
+    END IF;
+END;
+/
+
+-- After Trigger Delete
+CREATE OR REPLACE TRIGGER flight_after_delete
+AFTER DELETE ON Flight
+FOR EACH ROW
+DECLARE
+    v_username VARCHAR2(30);
+BEGIN
+    SELECT USER INTO v_username FROM dual;
+
+    INSERT INTO flightaudit (
+        flight_id,
+        airline_id,
+        flight_code,
+        deleted_at
+    ) VALUES (
+        :OLD.flight_id,
+        :OLD.airline_id,
+        :OLD.flight_code,
+        SYSTIMESTAMP
+    );
+
+    DBMS_OUTPUT.PUT_LINE('======================================');
+    DBMS_OUTPUT.PUT_LINE('🗑 Flight Deleted and Logged 🗑');
+    DBMS_OUTPUT.PUT_LINE('Flight ID   : ' || :OLD.flight_id);
+    DBMS_OUTPUT.PUT_LINE('Flight Code : ' || :OLD.flight_code);
+    DBMS_OUTPUT.PUT_LINE('Deleted by  : ' || v_username);
+    DBMS_OUTPUT.PUT_LINE('Timestamp   : ' || SYSTIMESTAMP);
+    DBMS_OUTPUT.PUT_LINE('======================================');
+END;
+/
 

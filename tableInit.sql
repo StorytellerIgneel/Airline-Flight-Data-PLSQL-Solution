@@ -1,6 +1,3 @@
--- ==========================================
--- STEP 1: Drop Tables (ignore errors if not exist)
--- ==========================================
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE Flight CASCADE CONSTRAINTS';
     EXECUTE IMMEDIATE 'DROP TABLE Airline CASCADE CONSTRAINTS';
@@ -12,34 +9,37 @@ EXCEPTION WHEN OTHERS THEN NULL;
 END;
 /
 
--- ==========================================
--- STEP 2: Recreate Tables (with AUTO-INCREMENT IDs)
--- ==========================================
+-- Create Airline table
 CREATE TABLE Airline (
     airline_id    NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     airline_name  VARCHAR2(100) UNIQUE
 );
 
+-- Create City table
 CREATE TABLE City (
     city_id     NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     city_name   VARCHAR2(100) UNIQUE
 );
 
+-- Create Stop table
 CREATE TABLE Stop (
     stop_id     NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     stop_count  VARCHAR2(50) UNIQUE
 );
 
+-- Create Class table
 CREATE TABLE Class (
     class_id    NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     class_name  VARCHAR2(50) UNIQUE
 );
 
+-- Create Time table
 CREATE TABLE Time (
     time_id        NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     time_category  VARCHAR2(100) UNIQUE
 );
 
+-- Create Flight table
 CREATE TABLE Flight (
     flight_id          NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     flight_code        VARCHAR2(50),

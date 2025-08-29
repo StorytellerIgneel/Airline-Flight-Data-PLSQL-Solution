@@ -1,3 +1,5 @@
+-- CRUD Operation
+-- Read records in all table
 SET SERVEROUTPUT ON SIZE UNLIMITED;
 
 ACCEPT prompt_table_name  PROMPT 'Enter table name: '
@@ -21,7 +23,6 @@ DECLARE
     v_dummy     INT;
     v_row_count INTEGER := 0; -- output counter 
 BEGIN
-    -- Build SQL dynamically
     v_sql := 'SELECT ' || v_output || ' FROM ' || v_table;
     
     IF TRIM(v_join) IS NOT NULL THEN
