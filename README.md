@@ -1,7 +1,8 @@
 # SQL Project Execution Guide
 
-This project contains SQL scripts for database initialization, optimization, CRUD operations, triggers, stored procedures, and data analysis.  
+This project contains SQL scripts for database initialization, optimization, CRUD operations, triggers, procedures, and data analysis.  
 Please follow the sequence below to run the files correctly:
+
 ---
 ## 1. Initialization
 Run the following script to import datasets and create initial tables:
@@ -11,8 +12,8 @@ This step sets up the database schema and loads the necessary data.
 ## 2. Indexes
 Run:
 - `indexes.sql`
-This script creates indexes to optimize query performance.  
-(Completes **Task 2** and **Task 3** together with initialization.)
+This script creates indexes to optimize query performance.
+This script performs **Task 2** and **Task 3** together with initialization.
 ---
 ## 3. CRUD Operations
 Navigate to the **CRUD** subfolder and run the files inside.  
@@ -28,9 +29,9 @@ This script implements triggers in PL/SQL. The following triggers are included:
 - **After Update Trigger** – performs an action after update.  
 - **Before Delete Trigger** – validates data before deletion.  
 - **After Delete Trigger** – performs an action after deletion.  
-These scripts perform **Task 6**
+This scripts performs **Task 6**.
 ---
-## 5. Stored Procedures
+## 5. Procedures
 Run:
 - `procedure.sql`
 This script defines and runs stored procedures for specific operations.
@@ -38,6 +39,7 @@ This script defines and runs stored procedures for specific operations.
 ## 6. Data Analysis
 Finally, navigate to the **Data Analysis** subfolder and run the query files provided.  
 These scripts are used for advanced query analysis and reporting.
+These scripts perform **Task 7**.
 
 ---
 
@@ -48,10 +50,3 @@ These scripts are used for advanced query analysis and reporting.
 4. `flightTrigger.sql`  
 5. `procedure.sql`  
 6. Files inside `Data Analysis/`
-
----
-
-## Notes
-- Ensure you are connected to the correct database before running scripts.  
-- Run each script in the given order to avoid dependency errors.  
-- Check comments inside each SQL file for additional details.
