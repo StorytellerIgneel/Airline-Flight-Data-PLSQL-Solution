@@ -58,6 +58,7 @@ BEGIN
 END;
 /
 
+-- Show Flight Details by Flight ID
 CREATE OR REPLACE PROCEDURE Show_Flight_Details(p_flight_id IN NUMBER) IS
 BEGIN
     DBMS_OUTPUT.PUT_LINE('✈️ Current Flight Details ✈️');
