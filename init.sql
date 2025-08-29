@@ -3,8 +3,9 @@
 -- ==========================================
 ACCEPT file_path CHAR PROMPT 'Enter full OS path for Data Pump directory: '
 ACCEPT csv_file_name CHAR PROMPT 'Enter CSV file name: '
+
 -- ==========================================
--- STEP 1: Drop Tables (ignore errors if not exist)
+-- STEP 2: Drop Tables (ignore errors if not exist)
 -- ==========================================
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE Flight CASCADE CONSTRAINTS';
@@ -16,7 +17,7 @@ BEGIN
 EXCEPTION WHEN OTHERS THEN NULL;
 END;
 -- ==========================================
--- STEP 2: Recreate Tables (with AUTO-INCREMENT IDs)
+-- STEP 3: Recreate Tables (with AUTO-INCREMENT IDs)
 -- ==========================================
 CREATE TABLE Airline (
     airline_id    NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -60,7 +61,7 @@ CREATE TABLE Flight (
     FOREIGN KEY (class_id) REFERENCES Class(class_id)
 );
 -- ==========================================
--- STEP 2: CSV Import via UTL_FILE
+-- STEP 4: CSV Import via UTL_FILE
 -- ==========================================
 DECLARE
     v_file      UTL_FILE.FILE_TYPE;
@@ -205,7 +206,7 @@ END;
 /
 COMMIT;
 -- ==========================================
--- STEP 3: Verification
+-- STEP 5: Verification
 -- ==========================================
 SELECT COUNT(*) AS total_flights FROM Flight;
 SELECT COUNT(*) AS total_airlines FROM Airline;
